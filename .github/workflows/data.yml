@@ -1,0 +1,28 @@
+name: Nightly data
+on:
+  schedule:
+    - cron: "15 3 * * *"
+  workflow_dispatch:
+concurrency: data
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Member details and EP body names change rarely: reuse them for a week to spare the EP API.
+      - uses: actions/cache@v4
+        with:
+          path: data/raw/ep
+          key: ep-${{ github.run_id }}
+          restore-keys: ep-
+      - run: pnpm pipeline
+      - run: pnpm pipeline:upload
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}

@@ -6,3 +6,7 @@ dist/
 *.log
 .DS_Store
 data/raw/
+.vercel
+data/
+public/data/
+*.tsbuildinfo

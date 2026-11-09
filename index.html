@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Mandaat. Zij werken voor ons.</title>
+    <meta name="description" content="Een publiek dossier voor elke Europarlementariër: wie ze ontmoeten, wie hen lobbyt en hoe ze stemmen. Alleen officiële bronnen." />
+    <meta name="theme-color" content="#F2F4F1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14171E" media="(prefers-color-scheme: dark)" />
+    <meta property="og:title" content="Mandaat" />
+    <meta property="og:description" content="Wie ontmoeten ze. Wie lobbyt hen. Hoe stemmen ze. Zij werken voor ons." />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://www.europarl.europa.eu" />
+    <script>
+      try {
+        var t = localStorage.getItem("mandaat.theme");
+        if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

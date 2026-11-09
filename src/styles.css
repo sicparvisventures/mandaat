@@ -1,0 +1,251 @@
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource/public-sans/400.css";
+@import "@fontsource/public-sans/500.css";
+@import "@fontsource/public-sans/600.css";
+@import "@fontsource/public-sans/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "tailwindcss";
+
+/*
+  Mandaat design tokens.
+  Identity: the politician's public file as an inverted eID card. Cool paper, ink, one accent (stamp violet),
+  eID sea-green only inside the ID card. Radius scale: 8 (inner), 12 (controls), 16 (cards), 20 (sheets).
+*/
+:root {
+  --paper: oklch(96.5% 0.004 150);
+  --surface: oklch(99.5% 0.002 150);
+  --sunken: oklch(93.8% 0.006 150);
+  --ink: oklch(21% 0.02 265);
+  --muted: oklch(47% 0.017 260);
+  --faint: oklch(62% 0.012 260);
+  --line: oklch(88.5% 0.008 150);
+  --stamp: oklch(45% 0.21 285);
+  --stamp-ink: oklch(99% 0.01 285);
+  --stamp-soft: oklch(93.5% 0.04 290);
+  --id: oklch(92.5% 0.022 165);
+  --guil: oklch(73% 0.045 168);
+  --good: oklch(50% 0.12 155);
+  --warn: oklch(56% 0.13 65);
+  --bad: oklch(52% 0.18 28);
+  --shadow: 220 30% 20%;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: oklch(17% 0.012 260);
+    --surface: oklch(21% 0.014 260);
+    --sunken: oklch(14.5% 0.012 260);
+    --ink: oklch(93% 0.006 260);
+    --muted: oklch(72% 0.014 260);
+    --faint: oklch(58% 0.014 260);
+    --line: oklch(30% 0.014 260);
+    --stamp: oklch(74% 0.14 288);
+    --stamp-ink: oklch(18% 0.04 285);
+    --stamp-soft: oklch(28% 0.07 288);
+    --id: oklch(25% 0.025 170);
+    --guil: oklch(42% 0.045 168);
+    --good: oklch(74% 0.13 155);
+    --warn: oklch(78% 0.13 75);
+    --bad: oklch(72% 0.15 28);
+    --shadow: 230 40% 3%;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: oklch(17% 0.012 260);
+  --surface: oklch(21% 0.014 260);
+  --sunken: oklch(14.5% 0.012 260);
+  --ink: oklch(93% 0.006 260);
+  --muted: oklch(72% 0.014 260);
+  --faint: oklch(58% 0.014 260);
+  --line: oklch(30% 0.014 260);
+  --stamp: oklch(74% 0.14 288);
+  --stamp-ink: oklch(18% 0.04 285);
+  --stamp-soft: oklch(28% 0.07 288);
+  --id: oklch(25% 0.025 170);
+  --guil: oklch(42% 0.045 168);
+  --good: oklch(74% 0.13 155);
+  --warn: oklch(78% 0.13 75);
+  --bad: oklch(72% 0.15 28);
+  --shadow: 230 40% 3%;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-stamp: var(--stamp);
+  --color-stamp-ink: var(--stamp-ink);
+  --color-stamp-soft: var(--stamp-soft);
+  --color-id: var(--id);
+  --color-guil: var(--guil);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --font-display: "Archivo Variable", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--stamp);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  ::selection {
+    background: var(--stamp-soft);
+  }
+}
+
+@layer components {
+  .display {
+    font-family: var(--font-display);
+    font-stretch: 72%;
+    font-weight: 850;
+    letter-spacing: -0.012em;
+    line-height: 0.98;
+  }
+  .display-md {
+    font-family: var(--font-display);
+    font-stretch: 84%;
+    font-weight: 780;
+    letter-spacing: -0.006em;
+    line-height: 1.08;
+  }
+  .label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  .card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 1px var(--line),
+      0 1px 2px hsl(var(--shadow) / 0.05),
+      0 4px 14px -6px hsl(var(--shadow) / 0.08);
+  }
+  .press {
+    transition-property: scale, background-color, color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: var(--ease-out-soft);
+  }
+  .press:active {
+    scale: 0.96;
+  }
+  .img-outline {
+    outline: 1px solid oklch(0 0 0 / 0.1);
+    outline-offset: -1px;
+  }
+  :root[data-theme="dark"] .img-outline {
+    outline-color: oklch(1 0 0 / 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .img-outline {
+      outline-color: oklch(1 0 0 / 0.1);
+    }
+  }
+
+  /* The ID card guilloche: two offset sets of concentric rings, like the security print on an eID. */
+  .guilloche {
+    position: relative;
+    isolation: isolate;
+    background: var(--id);
+  }
+  .guilloche::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.5;
+    background:
+      repeating-radial-gradient(circle at 112% -24%, transparent 0 9px, var(--guil) 9px 10px),
+      repeating-radial-gradient(circle at -14% 128%, transparent 0 11px, var(--guil) 11px 12px);
+  }
+  .mrz {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .stampmark {
+    border: 2px solid var(--stamp);
+    color: var(--stamp);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    rotate: -8deg;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--sunken), var(--line), var(--sunken));
+    background-size: 200% 100%;
+    border-radius: 8px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton {
+      animation: shimmer 1.4s linear infinite;
+    }
+    .enter {
+      animation: enter 420ms var(--ease-out-soft) both;
+      animation-delay: calc(var(--i, 0) * 60ms);
+    }
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition: none !important;
+}
