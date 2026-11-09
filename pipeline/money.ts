@@ -100,7 +100,8 @@ export async function buildMoney(
       const name = r["Name of beneficiary"] ?? "";
       if (!name) continue;
       const k = kbo(r["VAT number of beneficiary"]) ?? kbo(r["Main registration number of beneficiary"]);
-      const city = r.City ? r.City.trim() : null;
+      const rawCity = r.City?.trim() ?? "";
+      const city = /[a-z]/i.test(rawCity) ? rawCity : null;
       const e = entity(name, k, city ? city[0] + city.slice(1).toLowerCase() : null);
       const dept = r["Responsible department"] || null;
       e.flows.push({
