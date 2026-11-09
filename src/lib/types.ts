@@ -98,6 +98,7 @@ export type OrgDossier = OrgSummary & {
     costMin: number | null;
     costMax: number | null;
     costYear: string | null;
+    costKind: "lobby" | "total" | null;
     persons: number | null;
     fte: number | null;
     accreditations: number | null;

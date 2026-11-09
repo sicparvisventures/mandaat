@@ -136,7 +136,9 @@ function OrgView({ o }: { o: OrgDossier }) {
         {t("lobby.title")}
       </Link>
       <header className="flex flex-col gap-2">
-        <h1 className="display text-[34px] sm:text-[46px]">{o.name}</h1>
+        <h1 className={`display ${o.name.length > 48 ? "text-[26px] sm:text-[36px]" : "text-[34px] sm:text-[46px]"}`}>
+          {o.name}
+        </h1>
         <p className="text-[14px] text-muted">
           {[r?.category ?? o.category, r?.country ? countryName(r.country, locale) : null].filter(Boolean).join(", ")}
         </p>
@@ -144,7 +146,10 @@ function OrgView({ o }: { o: OrgDossier }) {
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat value={o.meetings} label={t("lobby.meetings")} />
-        <Stat value={cost} label={`${t("lobby.budget")}${r?.costYear ? ` (${r.costYear})` : ""}`} />
+        <Stat
+          value={cost}
+          label={`${t(r?.costKind === "total" ? "lobby.totalBudget" : "lobby.budget")}${r?.costYear ? ` (${r.costYear})` : ""}`}
+        />
         <Stat value={r?.persons ?? "-"} label={t("lobby.persons")} />
         <Stat value={r?.accreditations ?? "-"} label={t("lobby.accreditations")} />
       </div>

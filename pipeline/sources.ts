@@ -123,6 +123,8 @@ export type RegisterOrg = {
   costMin: number | null;
   costMax: number | null;
   costYear: string | null;
+  /** "lobby": declared EU lobbying costs. "total": NGOs report their total budget instead. */
+  costKind: "lobby" | "total" | null;
   interests: string[];
 };
 
@@ -153,16 +155,20 @@ export async function register(): Promise<{ orgs: Map<string, RegisterOrg>; expo
     let costMin: number | null = null;
     let costMax: number | null = null;
     let costYear: string | null = null;
+    let costKind: RegisterOrg["costKind"] = null;
     if (closed && closed[1] !== "ClosedYearClientFinancialInformation") {
       const body = closed[2] ?? "";
       // Direct <costs> of the closed year (not the per-intermediary representationCosts)
       const costs = body.match(/<costs type="(\w+)"[^>]*>([\s\S]*?)<\/costs>/);
-      if (costs) {
-        if (costs[1] === "CostRange") {
-          costMin = num(tag(costs[2] ?? "", "min"));
-          costMax = num(tag(costs[2] ?? "", "max"));
+      const total = body.match(/<totalBudget type="(\w+)"[^>]*>([\s\S]*?)<\/totalBudget>/);
+      const pick = costs ?? total;
+      if (pick) {
+        costKind = costs ? "lobby" : "total";
+        if (pick[1] === "CostRange") {
+          costMin = num(tag(pick[2] ?? "", "min"));
+          costMax = num(tag(pick[2] ?? "", "max"));
         } else {
-          costMin = costMax = num(tag(costs[2] ?? "", "absoluteCost"));
+          costMin = costMax = num(tag(pick[2] ?? "", "absoluteCost"));
         }
       }
       const sd = tag(body, "startDate");
@@ -187,6 +193,7 @@ export async function register(): Promise<{ orgs: Map<string, RegisterOrg>; expo
       costMin,
       costMax,
       costYear,
+      costKind,
       interests,
     });
   }

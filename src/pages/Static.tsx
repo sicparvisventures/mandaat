@@ -132,7 +132,7 @@ export function Sources() {
       </dl>
 
       <section className="flex flex-col gap-3">
-        <SectionTitle>{t("common.source")}</SectionTitle>
+        <SectionTitle>{t("dossier.tabSources")}</SectionTitle>
         {meta.data ? (
           <div className="overflow-x-auto rounded-2xl shadow-[0_0_0_1px_var(--line)]">
             <table className="w-full min-w-[560px] border-collapse bg-surface text-left text-[13.5px]">

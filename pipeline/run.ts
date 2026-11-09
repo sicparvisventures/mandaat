@@ -348,6 +348,7 @@ async function main() {
             costMin: r.costMin,
             costMax: r.costMax,
             costYear: r.costYear,
+            costKind: r.costKind,
             persons: r.persons,
             fte: r.fte,
             accreditations: r.accreditations,
