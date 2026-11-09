@@ -1,0 +1,644 @@
+<title>Mandaat Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column for the scope, wide bands for the phone row and the desktop frame.
+   Identity: the politician's "personnel file" as an inverted eID card: guilloche, stamp ink, MRZ. */
+:root{
+  --paper:#F2F4F1; --surface:#FFFFFF; --ink:#141925; --muted:#5A6270; --line:#D8DCD5;
+  --stamp:#4A30C2; --stamp-soft:#E9E4FC; --id:#E1ECE7; --guil:#8FB2A6;
+  --good:#1D7A4C; --warn:#A86400; --bad:#B42318; --chip:#EEF0EC;
+  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0E1117; --surface:#161A22; --ink:#E7E9EE; --muted:#9AA1AE; --line:#2A303B;
+  --stamp:#A495FF; --stamp-soft:#241E44; --id:#16231E; --guil:#3E6357;
+  --good:#4CC38A; --warn:#E0A030; --bad:#F2766B; --chip:#1E232D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0E1117; --surface:#161A22; --ink:#E7E9EE; --muted:#9AA1AE; --line:#2A303B;
+  --stamp:#A495FF; --stamp-soft:#241E44; --id:#16231E; --guil:#3E6357;
+  --good:#4CC38A; --warn:#E0A030; --bad:#F2766B; --chip:#1E232D; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.col{max-width:720px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.05}
+h2{font-size:clamp(28px,4vw,40px);font-weight:800;font-stretch:78%;letter-spacing:-.01em}
+h3{font-size:19px;font-weight:700;font-stretch:90%}
+p{margin:0}
+a{color:var(--stamp)}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono)}
+section{padding-block:56px;border-top:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.lede{font-size:18px;color:var(--muted);max-width:62ch}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* Hero */
+.hero{padding-block:56px 48px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(48px,8vw,96px);font-weight:900;font-stretch:66%;letter-spacing:-.02em;line-height:.92}
+.hero h1 span{color:var(--stamp)}
+.manifest{font-family:var(--f-display);font-stretch:88%;font-size:19px;line-height:1.35;display:flex;flex-direction:column;gap:2px}
+.manifest b{font-weight:800}
+.status{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-family:var(--f-mono);font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.pill.on{border-color:var(--stamp);color:var(--stamp);background:var(--stamp-soft)}
+
+/* ID card (used in hero + app) */
+.idcard{position:relative;border-radius:16px;overflow:hidden;background:var(--id);border:1px solid color-mix(in oklab,var(--guil) 60%,transparent);padding:18px 18px 0;color:var(--ink)}
+.idcard::before{content:"";position:absolute;inset:0;opacity:.55;pointer-events:none;
+  background:
+   repeating-radial-gradient(circle at 115% -20%,transparent 0 9px,var(--guil) 9px 10px),
+   repeating-radial-gradient(circle at -15% 130%,transparent 0 11px,var(--guil) 11px 12px);
+  mix-blend-mode:multiply}
+:root[data-theme="dark"] .idcard::before{mix-blend-mode:screen;opacity:.35}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .idcard::before{mix-blend-mode:screen;opacity:.35}}
+.idcard>*{position:relative}
+.id-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.id-kind{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);line-height:1.4}
+.id-kind b{color:var(--ink);font-weight:600}
+.eu{width:34px;height:24px;border-radius:4px;background:var(--stamp);display:grid;place-items:center;color:var(--surface);font:700 10px var(--f-mono);flex:none}
+.id-body{display:grid;grid-template-columns:84px 1fr;gap:14px;margin-top:14px}
+.portrait{aspect-ratio:3/4;border-radius:8px;background:linear-gradient(160deg,color-mix(in oklab,var(--guil) 70%,var(--surface)),color-mix(in oklab,var(--guil) 30%,var(--surface)));display:grid;place-items:end center;overflow:hidden}
+.portrait i{width:60%;aspect-ratio:1;border-radius:50% 50% 0 0;background:color-mix(in oklab,var(--ink) 22%,transparent);display:block;margin-top:auto}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;min-width:0}
+.f{min-width:0}
+.f small{display:block;font:600 9px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.f span{display:block;font-size:13px;font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.f.wide{grid-column:1/-1}
+.f .name{font-family:var(--f-display);font-size:22px;font-weight:800;font-stretch:80%}
+.mrz{margin:14px -18px 0;padding:10px 18px;background:color-mix(in oklab,var(--surface) 70%,transparent);font:500 11px/1.45 var(--f-mono);letter-spacing:.14em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:clip}
+.stampmark{position:absolute;right:14px;top:54px;transform:rotate(-9deg);border:2px solid var(--stamp);color:var(--stamp);font:700 11px var(--f-mono);letter-spacing:.14em;padding:3px 8px;border-radius:6px;opacity:.85}
+
+/* Scope grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.box p{color:var(--muted);font-size:15px}
+.box ul{margin:0;padding-left:18px;color:var(--muted);font-size:15px;display:flex;flex-direction:column;gap:4px}
+.tag{align-self:flex-start;font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--chip);color:var(--muted)}
+.tag.mvp{background:var(--stamp-soft);color:var(--stamp)}
+
+/* Sources table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:780px;font-size:14px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--chip)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+td small{color:var(--muted);display:block;font-size:12.5px}
+.lvl{font:600 11px var(--f-mono);padding:2px 7px;border-radius:5px;white-space:nowrap}
+.lvl.ok{color:var(--good);background:color-mix(in oklab,var(--good) 14%,transparent)}
+.lvl.mid{color:var(--warn);background:color-mix(in oklab,var(--warn) 14%,transparent)}
+.lvl.lo{color:var(--bad);background:color-mix(in oklab,var(--bad) 12%,transparent)}
+
+/* Phones */
+.phones{display:flex;gap:28px;overflow-x:auto;padding:8px 4px 24px;scroll-snap-type:x mandatory}
+.phone-cap{display:flex;flex-direction:column;gap:12px;flex:none;scroll-snap-align:start}
+.phone-cap>p{font-size:14px;color:var(--muted);max-width:300px}
+.phone{width:300px;height:640px;border-radius:44px;border:10px solid var(--ink);background:var(--paper);overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 24px 50px -24px rgba(20,25,37,.45)}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:84px;height:22px;border-radius:12px;background:var(--ink);z-index:3}
+.app{flex:1;overflow:hidden;display:flex;flex-direction:column;font-size:13px;line-height:1.4}
+.app-head{padding:40px 16px 10px;display:flex;flex-direction:column;gap:10px;background:var(--paper)}
+.app-title{font-family:var(--f-display);font-weight:900;font-stretch:70%;font-size:30px;line-height:1}
+.app-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.brand{font-family:var(--f-display);font-weight:900;font-stretch:66%;font-size:18px;letter-spacing:.01em}
+.brand i{font-style:normal;color:var(--stamp)}
+.lang{font:600 10px var(--f-mono);color:var(--muted);display:flex;gap:6px}
+.lang b{color:var(--ink)}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;color:var(--muted)}
+.search svg{flex:none}
+.app-body{flex:1;overflow:hidden;padding:4px 16px 12px;display:flex;flex-direction:column;gap:10px}
+.seg{display:flex;gap:6px;overflow:hidden}
+.seg span{font-size:11.5px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.seg span.on{background:var(--ink);color:var(--paper)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.card .k{display:flex;align-items:center;gap:6px;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--stamp);flex:none}
+.dot.g{background:var(--good)} .dot.w{background:var(--warn)}
+.card b{font-weight:700}
+.src{align-self:flex-start;font:500 9.5px var(--f-mono);color:var(--muted);border:1px dashed var(--line);border-radius:5px;padding:2px 6px}
+.faces{display:flex;gap:8px;overflow:hidden}
+.face{flex:none;width:52px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--muted);text-align:center;line-height:1.15}
+.face i{width:46px;height:46px;border-radius:50%;background:linear-gradient(160deg,var(--id),color-mix(in oklab,var(--guil) 60%,var(--surface)));border:2px solid var(--surface);outline:1px solid var(--line);display:block}
+.tabbar{display:flex;justify-content:space-around;padding:8px 6px 18px;border-top:1px solid var(--line);background:var(--surface)}
+.tabbar span{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:600;color:var(--muted)}
+.tabbar span.on{color:var(--stamp)}
+.tabbar svg{width:20px;height:20px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px}
+.stat b{display:block;font-family:var(--f-display);font-size:22px;font-weight:800;font-stretch:80%;line-height:1}
+.stat small{font-size:10px;color:var(--muted);line-height:1.2;display:block;margin-top:3px}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:11.5px}
+.bar em{font-style:normal;color:var(--muted);font-family:var(--f-mono);font-size:10.5px}
+.bar .t{grid-column:1/-1;height:6px;border-radius:4px;background:var(--chip);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--stamp);border-radius:4px}
+.mini{font-size:10px;color:var(--muted)}
+.idcard.sm{padding:14px 14px 0;border-radius:14px}
+.idcard.sm .id-body{grid-template-columns:62px 1fr;gap:10px;margin-top:10px}
+.idcard.sm .f .name{font-size:19px}
+.idcard.sm .f span{font-size:11.5px}
+.idcard.sm .mrz{margin:10px -14px 0;padding:7px 14px;font-size:8.5px}
+.idcard.sm .stampmark{top:42px;right:10px;font-size:9px}
+.ttl{display:flex;justify-content:space-between;align-items:baseline}
+.ttl h4{margin:0;font-family:var(--f-display);font-stretch:85%;font-size:15px;font-weight:800}
+.ttl span{font-size:10.5px;color:var(--stamp);font-weight:600}
+.list{display:flex;flex-direction:column}
+.li{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+.li:last-child{border-bottom:0}
+.li span:last-child{font-family:var(--f-mono);color:var(--muted);font-size:11px;white-space:nowrap}
+.big{font-family:var(--f-display);font-weight:900;font-stretch:68%;font-size:40px;line-height:1}
+
+/* Desktop frame */
+.deskwrap{overflow-x:auto;padding-bottom:8px}
+.desk{min-width:1000px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:0 30px 60px -30px rgba(20,25,37,.35)}
+.chrome{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.chrome i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}
+.url{margin-left:12px;flex:1;max-width:420px;font:500 12px var(--f-mono);color:var(--muted);background:var(--chip);border-radius:8px;padding:5px 10px}
+.dgrid{display:grid;grid-template-columns:210px 1fr 300px;min-height:600px;font-size:13.5px}
+.side{border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;background:var(--surface)}
+.side .brand{font-size:24px;margin-bottom:16px;padding-left:8px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:var(--muted);font-weight:600}
+.nav.on{background:var(--stamp-soft);color:var(--stamp)}
+.nav svg{width:18px;height:18px}
+.side .sep{height:1px;background:var(--line);margin:12px 0}
+.main{padding:24px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.crumbs{font-size:12px;color:var(--muted)}
+.dcards{display:grid;grid-template-columns:1.15fr 1fr;gap:16px}
+.dstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dstats .stat b{font-size:28px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs span{padding:8px 12px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs span.on{color:var(--ink);border-color:var(--stamp)}
+.rail{border-left:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:14px;background:var(--surface)}
+.tl{display:flex;flex-direction:column;gap:0}
+.tli{display:grid;grid-template-columns:14px 1fr;gap:10px;padding-bottom:14px;position:relative}
+.tli::before{content:"";position:absolute;left:6px;top:14px;bottom:0;width:1px;background:var(--line)}
+.tli:last-child::before{display:none}
+.tli .dot{margin-top:6px;width:9px;height:9px;margin-left:2px}
+.tli small{display:block;color:var(--muted);font-size:11.5px}
+
+/* Architecture */
+.flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap}
+.node{flex:1 1 170px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.node b{font-family:var(--f-display);font-stretch:85%;font-size:16px}
+.node span{font-size:13px;color:var(--muted)}
+.node.hot{border-color:var(--stamp);background:var(--stamp-soft)}
+.arrow{align-self:center;color:var(--muted);font-family:var(--f-mono)}
+.stacklist{display:grid;grid-template-columns:repeat(2,1fr);gap:0 24px}
+.sl{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+.sl span:first-child{font:600 12px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+
+/* Roadmap */
+.road{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.ph{border-top:3px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.ph.now{border-color:var(--stamp)}
+.ph b{font-family:var(--f-display);font-stretch:85%;font-size:17px}
+.ph p{font-size:14px;color:var(--muted)}
+
+/* Decisions */
+.dec{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.d{display:grid;grid-template-columns:44px 1fr;gap:14px;padding:16px 18px;border-bottom:1px solid var(--line)}
+.d:last-child{border-bottom:0}
+.d .n{font-family:var(--f-display);font-weight:900;font-stretch:70%;font-size:28px;color:var(--stamp);line-height:1}
+.d b{display:block;margin-bottom:2px}
+.d p{color:var(--muted);font-size:15px}
+.d .rec{color:var(--ink);font-weight:600}
+
+footer{padding-block:32px 48px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;gap:32px}
+  .grid3{grid-template-columns:1fr 1fr}
+  .road{grid-template-columns:1fr 1fr}
+  .stacklist{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .grid2,.grid3,.road{grid-template-columns:1fr}
+  .arrow{display:none}
+  .sl{grid-template-columns:96px 1fr}
+  section{padding-block:40px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .stampmark{animation:stamp .5s cubic-bezier(.2,1.6,.4,1) both .3s}
+  @keyframes stamp{from{transform:rotate(-9deg) scale(1.6);opacity:0}to{transform:rotate(-9deg) scale(1);opacity:.85}}
+}
+</style>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="stack" style="gap:22px">
+    <span class="eyebrow">Werktitel · scope &amp; mockup · v0.1 · 9 nov 2026</span>
+    <h1>Een digitale ID<br>voor <span>politici</span>.</h1>
+    <div class="manifest">
+      <span>Wie ontmoeten ze. Wie lobbyt hen.</span>
+      <span>Waar gaat ons belastinggeld naartoe.</span>
+      <span><b>Zij werken voor ons, niet omgekeerd.</b></span>
+    </div>
+    <p class="lede">Een gratis PWA voor België en Europa. Elke politicus krijgt een publiek dossier, opgebouwd uit officiële open data. Elke bewering heeft een bronstempel met datum en link.</p>
+    <div class="status">
+      <span class="pill on">Fase 0: scope + mockup</span>
+      <span class="pill">Wacht op jouw goedkeuring</span>
+      <span class="pill">Alle data hieronder is voorbeelddata</span>
+    </div>
+  </div>
+
+  <div class="idcard" aria-label="Voorbeeld van een politiek dossier als ID-kaart">
+    <div class="id-top">
+      <div class="id-kind">Publiek dossier · Dossier public<br><b>Europees Parlement · België</b></div>
+      <div class="eu">BE</div>
+    </div>
+    <span class="stampmark">VOORBEELD</span>
+    <div class="id-body">
+      <div class="portrait"><i></i></div>
+      <div class="fields">
+        <div class="f wide"><small>Naam</small><span class="name">An Peeters</span></div>
+        <div class="f"><small>Functie</small><span>Europarlementslid</span></div>
+        <div class="f"><small>Sinds</small><span class="tnum">02.07.2019</span></div>
+        <div class="f"><small>Werkgever</small><span>De burgers</span></div>
+        <div class="f"><small>Brutoloon / mnd</small><span class="tnum">€ 10.075</span></div>
+      </div>
+    </div>
+    <div class="mrz">IDBEL&lt;MANDAAT&lt;EP&lt;2019&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br>PEETERS&lt;&lt;AN&lt;&lt;WERKT&lt;VOOR&lt;ONS&lt;&lt;&lt;&lt;&lt;&lt;</div>
+  </div>
+</header>
+
+<!-- SCOPE -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Scope</span>
+    <h2>Vier modules, één regel: alleen publieke feiten</h2>
+    <p class="lede">De MVP start op Europees niveau, omdat daar de beste open data zit. België is de standaardfilter. Daarna komen de Kamer en het Vlaams Parlement.</p>
+  </div>
+  <div class="grid2" style="margin-top:28px">
+    <div class="box"><span class="tag mvp">MVP</span><h3>Dossier per politicus</h3>
+      <p>De ID-kaart: mandaten, fractie, commissies, stemgedrag en aanwezigheid, gedeclareerde lobbymeetings, nevenfuncties en financiële belangen.</p></div>
+    <div class="box"><span class="tag mvp">MVP</span><h3>Lobbyradar</h3>
+      <p>Per organisatie uit het EU-transparantieregister: lobbybudget, aantal lobbyisten, badges, en welke politici ze ontmoet hebben. Ook omgekeerd: wie ontmoet een politicus het vaakst.</p></div>
+    <div class="box"><span class="tag">Fase 2</span><h3>Geldstroom</h3>
+      <p>Waar gaat het geld naartoe: EU-budget naar Belgische ontvangers (FTS), cohesieprojecten (Kohesio) en overheidsopdrachten (TED). Later de federale begroting.</p></div>
+    <div class="box"><span class="tag mvp">MVP</span><h3>Vandaag &amp; volgen</h3>
+      <p>Een feed met wat er nieuw is: meetings, stemmingen, nieuwe registraties. Volg politici zonder account; je lijst blijft op je eigen toestel.</p></div>
+  </div>
+  <div class="grid3" style="margin-top:16px">
+    <div class="box"><h3>Wat we wel doen</h3><ul>
+      <li>Alleen data over de publieke functie</li><li>Bronstempel op elke bewering</li><li>Context tonen: “vrijwillig gedeclareerd”</li><li>Knop “Meld een fout” per feit</li></ul></div>
+    <div class="box"><h3>Wat we niet doen</h3><ul>
+      <li>Geen privé-adressen, familie of gezondheid</li><li>Geen eigen “corruptiescore” of oordeel</li><li>Geen scraping waar de voorwaarden het verbieden</li><li>Geen geruchten of niet-officiële bronnen</li></ul></div>
+    <div class="box"><h3>Burgers tracken we niet</h3><ul>
+      <li>Geen accounts in de MVP</li><li>Geen cookies, geen advertenties</li><li>Volglijst in IndexedDB op je toestel</li><li>Hooguit cookieloze bezoekstatistiek</li></ul></div>
+  </div>
+</section>
+
+<!-- MOBILE MOCKUPS -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Mockup · mobiel eerst</span>
+    <h2>De app op je telefoon</h2>
+    <p class="lede">Vier kernschermen. Scroll horizontaal. Namen van personen en organisaties met een * zijn verzonnen.</p>
+  </div>
+  <div class="phones" style="margin-top:24px">
+
+    <!-- 1 Vandaag -->
+    <div class="phone-cap">
+      <div class="phone"><div class="notch"></div><div class="app">
+        <div class="app-head">
+          <div class="app-row"><span class="brand">MANDAAT<i>.</i></span><span class="lang"><b>NL</b>FR EN</span></div>
+          <div class="search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Zoek politicus, lobby of ontvanger</div>
+        </div>
+        <div class="app-body">
+          <div class="ttl"><h4>Jouw 22 Belgische MEP's</h4><span>Alle</span></div>
+          <div class="faces"><div class="face"><i></i>Peeters*</div><div class="face"><i></i>Dubois*</div><div class="face"><i></i>Claes*</div><div class="face"><i></i>Lambert*</div><div class="face"><i></i>Maes*</div></div>
+          <div class="seg"><span class="on">Vandaag</span><span>Lobby</span><span>Stemmingen</span><span>Geld</span></div>
+          <div class="card"><span class="k"><i class="dot"></i>Lobbymeeting · 2 u</span>
+            <span><b>An Peeters*</b> ontmoette <b>Chemieverbond Europa*</b> over de REACH-herziening.</span>
+            <span class="src">europarl.europa.eu · 09.11.2026</span></div>
+          <div class="card"><span class="k"><i class="dot g"></i>Stemming · gisteren</span>
+            <span>21 van 22 Belgische MEP's stemden over de <b>verpakkingsverordening</b>. 14 voor, 6 tegen, 1 onthouding.</span>
+            <span class="src">EP Open Data · vote-results</span></div>
+          <div class="card"><span class="k"><i class="dot w"></i>Register · 3 d</span>
+            <span><b>Big Tech Forum*</b> verhoogde zijn gedeclareerde lobbybudget naar € 4–4,5 mln.</span>
+            <span class="src">EU-transparantieregister</span></div>
+        </div>
+        <div class="tabbar">
+          <span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7v9H4z"/></svg>Vandaag</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg>Dossiers</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>Lobby</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Geld</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.2 4.5 1.5 6.6z"/></svg>Volg</span>
+        </div>
+      </div></div>
+      <p><b>Vandaag.</b> Een feed van nieuwe feiten, elk met bronstempel. Bovenaan jouw vertegenwoordigers.</p>
+    </div>
+
+    <!-- 2 Dossier -->
+    <div class="phone-cap">
+      <div class="phone"><div class="notch"></div><div class="app">
+        <div class="app-head" style="padding-bottom:6px">
+          <div class="app-row"><span class="mini">‹ Dossiers</span><span class="mini" style="color:var(--stamp);font-weight:600">☆ Volg</span></div>
+        </div>
+        <div class="app-body">
+          <div class="idcard sm">
+            <div class="id-top"><div class="id-kind">Publiek dossier<br><b>EP · België</b></div><div class="eu">BE</div></div>
+            <span class="stampmark">VOORBEELD</span>
+            <div class="id-body"><div class="portrait"><i></i></div>
+              <div class="fields">
+                <div class="f wide"><small>Naam</small><span class="name">An Peeters*</span></div>
+                <div class="f"><small>Fractie</small><span>Groep X*</span></div>
+                <div class="f"><small>Commissies</small><span>ENVI · ITRE</span></div>
+              </div></div>
+            <div class="mrz">IDBEL&lt;MANDAAT&lt;EP&lt;2019&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+          </div>
+          <div class="stats">
+            <div class="stat"><b class="tnum">38</b><small>lobbymeetings, 12 mnd</small></div>
+            <div class="stat"><b class="tnum">91%</b><small>aanwezig bij stemmingen</small></div>
+            <div class="stat"><b class="tnum">2</b><small>nevenfuncties</small></div>
+          </div>
+          <div class="ttl"><h4>Ontmoet het vaakst</h4><span>Alle 38</span></div>
+          <div class="bars">
+            <div class="bar"><span>Chemieverbond Europa*</span><em>6</em><span class="t"><i style="width:100%"></i></span></div>
+            <div class="bar"><span>Agrifederatie*</span><em>5</em><span class="t"><i style="width:83%"></i></span></div>
+            <div class="bar"><span>Big Tech Forum*</span><em>4</em><span class="t"><i style="width:67%"></i></span></div>
+            <div class="bar"><span>Milieukoepel*</span><em>3</em><span class="t"><i style="width:50%"></i></span></div>
+          </div>
+          <span class="src">EP-meetings + transparantieregister · 08.11.2026</span>
+        </div>
+        <div class="tabbar">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7v9H4z"/></svg>Vandaag</span>
+          <span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg>Dossiers</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>Lobby</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Geld</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.2 4.5 1.5 6.6z"/></svg>Volg</span>
+        </div>
+      </div></div>
+      <p><b>Dossier.</b> De omgekeerde eID: wie ze zijn, voor wie ze werken en wie aan hun deur klopt.</p>
+    </div>
+
+    <!-- 3 Lobby -->
+    <div class="phone-cap">
+      <div class="phone"><div class="notch"></div><div class="app">
+        <div class="app-head">
+          <div class="app-row"><span class="mini">‹ Lobbyradar</span><span class="mini">Deel</span></div>
+          <span class="eyebrow" style="font-size:10px">Lobbyorganisatie · BE-kantoor</span>
+          <span class="app-title">Chemieverbond Europa*</span>
+        </div>
+        <div class="app-body">
+          <div class="stats">
+            <div class="stat"><b class="tnum">€3,5–4m</b><small>lobbybudget 2025</small></div>
+            <div class="stat"><b class="tnum">14</b><small>lobbyisten (9 FTE)</small></div>
+            <div class="stat"><b class="tnum">9</b><small>EP-badges</small></div>
+          </div>
+          <div class="ttl"><h4>Ontmoette deze politici</h4><span>12 mnd</span></div>
+          <div class="list">
+            <div class="li"><span>An Peeters* · MEP BE</span><span>6×</span></div>
+            <div class="li"><span>Jonas Maes* · MEP BE</span><span>3×</span></div>
+            <div class="li"><span>Kabinet Commissaris Milieu</span><span>2×</span></div>
+            <div class="li"><span>Lucie Dubois* · MEP BE</span><span>1×</span></div>
+          </div>
+          <div class="ttl"><h4>Onderwerpen</h4></div>
+          <div class="seg" style="flex-wrap:wrap"><span>REACH</span><span>Green Deal</span><span>PFAS</span><span>Energieprijzen</span></div>
+          <span class="src">Transparantieregister ID 000000000-00 (fictief)</span>
+        </div>
+        <div class="tabbar">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7v9H4z"/></svg>Vandaag</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg>Dossiers</span>
+          <span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>Lobby</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Geld</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.2 4.5 1.5 6.6z"/></svg>Volg</span>
+        </div>
+      </div></div>
+      <p><b>Lobbyradar.</b> Volg de organisatie in plaats van de persoon: budget, mensen en deuren.</p>
+    </div>
+
+    <!-- 4 Geld -->
+    <div class="phone-cap">
+      <div class="phone"><div class="notch"></div><div class="app">
+        <div class="app-head">
+          <div class="app-row"><span class="brand">MANDAAT<i>.</i></span><span class="lang">2025 ▾</span></div>
+          <span class="eyebrow" style="font-size:10px">EU-geld naar Belgische ontvangers</span>
+          <span class="big tnum">€ 1,9 mld<span class="mini" style="font-family:var(--f-body);font-size:11px;font-weight:500"> voorbeeld</span></span>
+        </div>
+        <div class="app-body">
+          <div class="seg"><span class="on">Programma</span><span>Ontvanger</span><span>Provincie</span></div>
+          <div class="bars">
+            <div class="bar"><span>Horizon Europe (onderzoek)</span><em>€ 720m</em><span class="t"><i style="width:100%"></i></span></div>
+            <div class="bar"><span>Cohesiefondsen</span><em>€ 410m</em><span class="t"><i style="width:57%"></i></span></div>
+            <div class="bar"><span>Connecting Europe</span><em>€ 290m</em><span class="t"><i style="width:40%"></i></span></div>
+            <div class="bar"><span>Erasmus+</span><em>€ 180m</em><span class="t"><i style="width:25%"></i></span></div>
+            <div class="bar"><span>Overige</span><em>€ 300m</em><span class="t"><i style="width:42%"></i></span></div>
+          </div>
+          <div class="ttl"><h4>Grootste ontvangers</h4><span>Alle</span></div>
+          <div class="list">
+            <div class="li"><span>Universiteit Voorbeeld*</span><span>€ 84m</span></div>
+            <div class="li"><span>Havenbedrijf Demo*</span><span>€ 61m</span></div>
+            <div class="li"><span>Onderzoekscentrum X*</span><span>€ 47m</span></div>
+          </div>
+          <span class="src">EU Financial Transparency System · Kohesio</span>
+        </div>
+        <div class="tabbar">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7v9H4z"/></svg>Vandaag</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg>Dossiers</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>Lobby</span>
+          <span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Geld</span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.2 4.5 1.5 6.6z"/></svg>Volg</span>
+        </div>
+      </div></div>
+      <p><b>Geldstroom (fase 2).</b> Bedragen per programma en ontvanger, gefilterd op België. Alle cijfers hier zijn verzonnen.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DESKTOP -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Mockup · desktop</span>
+    <h2>Dezelfde app, met ruimte voor context</h2>
+    <p class="lede">Op een groot scherm wordt de tabbalk een zijbalk en krijgt het dossier een tijdlijn met bronnen ernaast. Geen aparte site: één codebase, responsive.</p>
+  </div>
+  <div class="deskwrap" style="margin-top:24px">
+    <div class="desk">
+      <div class="chrome"><i></i><i></i><i></i><span class="url">mandaat.vercel.app/dossier/an-peeters</span></div>
+      <div class="dgrid">
+        <aside class="side">
+          <span class="brand">MANDAAT<i>.</i></span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11 12 4l8 7v9H4z"/></svg>Vandaag</span>
+          <span class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="12" r="2.5"/><path d="M14 10h4M14 14h3"/></svg>Dossiers</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg>Lobbyradar</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Geldstroom</span>
+          <span class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17.3 6.2 21l1.5-6.6L2.5 9.9l6.8-.6L12 3l2.7 6.3 6.8.6-5.2 4.5 1.5 6.6z"/></svg>Volglijst</span>
+          <span class="sep"></span>
+          <span class="nav">Bronnen &amp; methode</span>
+          <span class="nav">Meld een fout</span>
+          <span class="nav" style="margin-top:auto;font-size:12px">NL · FR · EN</span>
+        </aside>
+        <div class="main">
+          <span class="crumbs">Dossiers › Europees Parlement › België › An Peeters*</span>
+          <div class="dcards">
+            <div class="idcard">
+              <div class="id-top"><div class="id-kind">Publiek dossier · Dossier public<br><b>Europees Parlement · België</b></div><div class="eu">BE</div></div>
+              <span class="stampmark">VOORBEELD</span>
+              <div class="id-body"><div class="portrait"><i></i></div>
+                <div class="fields">
+                  <div class="f wide"><small>Naam</small><span class="name">An Peeters*</span></div>
+                  <div class="f"><small>Fractie</small><span>Groep X*</span></div>
+                  <div class="f"><small>Sinds</small><span class="tnum">02.07.2019</span></div>
+                  <div class="f"><small>Commissies</small><span>ENVI · ITRE</span></div>
+                  <div class="f"><small>Werkgever</small><span>De burgers</span></div>
+                </div></div>
+              <div class="mrz">IDBEL&lt;MANDAAT&lt;EP&lt;2019&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br>PEETERS&lt;&lt;AN&lt;&lt;WERKT&lt;VOOR&lt;ONS&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+            </div>
+            <div class="box" style="gap:12px">
+              <div class="ttl"><h4 style="font-size:17px">Ontmoet het vaakst</h4><span>12 maanden</span></div>
+              <div class="bars">
+                <div class="bar"><span>Chemieverbond Europa*</span><em>6</em><span class="t"><i style="width:100%"></i></span></div>
+                <div class="bar"><span>Agrifederatie*</span><em>5</em><span class="t"><i style="width:83%"></i></span></div>
+                <div class="bar"><span>Big Tech Forum*</span><em>4</em><span class="t"><i style="width:67%"></i></span></div>
+                <div class="bar"><span>Milieukoepel*</span><em>3</em><span class="t"><i style="width:50%"></i></span></div>
+                <div class="bar"><span>Vakbond Europa*</span><em>3</em><span class="t"><i style="width:50%"></i></span></div>
+              </div>
+              <span class="src">EP-meetings · transparantieregister</span>
+            </div>
+          </div>
+          <div class="dstats">
+            <div class="stat"><b class="tnum">38</b><small>lobbymeetings (12 mnd)</small></div>
+            <div class="stat"><b class="tnum">91%</b><small>aanwezig bij stemmingen</small></div>
+            <div class="stat"><b class="tnum">2</b><small>nevenfuncties, 1 bezoldigd</small></div>
+            <div class="stat"><b class="tnum">17</b><small>rapporten &amp; amendementen</small></div>
+          </div>
+          <div class="tabs"><span class="on">Meetings</span><span>Stemmingen</span><span>Belangen</span><span>Mandaten</span><span>Bronnen</span></div>
+          <div class="list">
+            <div class="li"><span><b>04.11</b> · Chemieverbond Europa* · REACH-herziening</span><span>europarl ↗</span></div>
+            <div class="li"><span><b>29.10</b> · Agrifederatie* · Mestbeleid en nitraat</span><span>europarl ↗</span></div>
+            <div class="li"><span><b>22.10</b> · Milieukoepel* · PFAS-verbod</span><span>europarl ↗</span></div>
+            <div class="li"><span><b>15.10</b> · Big Tech Forum* · AI-act uitvoering</span><span>europarl ↗</span></div>
+          </div>
+        </div>
+        <aside class="rail">
+          <div class="ttl"><h4 style="font-size:16px">Tijdlijn</h4><span>Alles</span></div>
+          <div class="tl">
+            <div class="tli"><i class="dot"></i><div><b>Lobbymeeting</b><small>04.11.2026 · Chemieverbond Europa*</small></div></div>
+            <div class="tli"><i class="dot g"></i><div><b>Stemde voor</b><small>23.10.2026 · Verpakkingsverordening</small></div></div>
+            <div class="tli"><i class="dot w"></i><div><b>Belangenverklaring gewijzigd</b><small>12.10.2026 · nieuwe nevenfunctie</small></div></div>
+            <div class="tli"><i class="dot"></i><div><b>Rapporteur benoemd</b><small>01.10.2026 · ENVI</small></div></div>
+          </div>
+          <div class="box" style="padding:14px;gap:6px;background:var(--paper)">
+            <span class="eyebrow" style="font-size:10px">Hoe lezen</span>
+            <p style="font-size:13px">Meetings zijn vrijwillig gedeclareerd door de MEP. Ontbrekende meetings zijn niet zichtbaar. We tonen wat officieel is, zonder oordeel.</p>
+          </div>
+          <span class="src">Laatst bijgewerkt 09.11.2026 03:00</span>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOURCES -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">OSINT &amp; open data</span>
+    <h2>Welke bronnen we gebruiken</h2>
+    <p class="lede">Gesorteerd op hoe bruikbaar ze zijn. “Geverifieerd” betekent dat ik de bron vandaag zelf heb aangesproken. De rest moet ik in fase 1 nog testen, inclusief licentie.</p>
+  </div>
+  <div class="tablewrap" style="margin-top:24px">
+    <table>
+      <thead><tr><th>Bron</th><th>Wat zit erin</th><th>Toegang</th><th>Licentie</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>EP Open Data API v2<small>data.europarl.europa.eu</small></td><td>Alle MEP's (filter op BE), stemresultaten per zitting, belangenverklaringen, documenten</td><td>REST, JSON-LD, gratis</td><td>Hergebruik toegestaan, bron vermelden</td><td><span class="lvl ok">Geverifieerd</span></td></tr>
+        <tr><td>EP-lobbymeetings<small>MEP-pagina's, “search MEP meetings”</small></td><td>Gedeclareerde ontmoetingen met datum, organisatie, onderwerp</td><td>CSV-export van de EP-site</td><td>EP-hergebruikbeleid</td><td><span class="lvl mid">Te testen</span></td></tr>
+        <tr><td>EU-transparantieregister<small>via data.europa.eu</small></td><td>Lobbyorganisaties, budgetten, lobbyisten, EP-badges</td><td>Dagelijkse XML/CSV-download</td><td>Open (EU-data)</td><td><span class="lvl mid">Te testen</span></td></tr>
+        <tr><td>Commissie-meetings<small>Commissarissen, kabinetten, DG's</small></td><td>Meetings van de Commissie met lobbyisten</td><td>Download via het register</td><td>Open (EU-data)</td><td><span class="lvl mid">Te testen</span></td></tr>
+        <tr><td>HowTheyVote.eu<small>github.com/HowTheyVote/data</small></td><td>Hoofdelijke stemmingen, wekelijks, nette CSV</td><td>GitHub releases</td><td>Open data (exacte licentie checken)</td><td><span class="lvl mid">Te testen</span></td></tr>
+        <tr><td>LobbyFacts<small>Corporate Europe Observatory &amp; LobbyControl</small></td><td>Historiek van het register sinds 2012</td><td>Downloads</td><td>Checken, waarschijnlijk vragen</td><td><span class="lvl mid">Te testen</span></td></tr>
+        <tr><td>EU Financial Transparency System</td><td>Ontvangers van EU-budget (direct beheer)</td><td>Jaarlijkse CSV/XLSX</td><td>Open (EU-data)</td><td><span class="lvl mid">Fase 2</span></td></tr>
+        <tr><td>Kohesio</td><td>Cohesieprojecten en begunstigden in België</td><td>Website + downloads</td><td>Open (EU-data)</td><td><span class="lvl mid">Fase 2</span></td></tr>
+        <tr><td>TED (overheidsopdrachten)</td><td>Gegunde opdrachten boven de EU-drempel</td><td>Gratis Search API</td><td>Open, bron vermelden</td><td><span class="lvl mid">Fase 2</span></td></tr>
+        <tr><td>Vlaams Parlement<small>ws.vlpar.be</small></td><td>Leden, vragen, stemmingen</td><td>Open data API (Swagger)</td><td>Checken</td><td><span class="lvl mid">Fase 3</span></td></tr>
+        <tr><td>De Kamer<small>dekamer.be</small></td><td>Leden, stemmingen, vragen, lobbyregister</td><td>Geen nette API, wel HTML/PDF</td><td>Checken</td><td><span class="lvl lo">Moeilijk</span></td></tr>
+        <tr><td>Rekenhof mandatenlijsten</td><td>Mandaten en vergoedingen van Belgische mandatarissen (jaarlijks)</td><td>Zoektool + publicaties</td><td>Wettelijk gepubliceerd</td><td><span class="lvl lo">Moeilijk</span></td></tr>
+        <tr><td>Wikidata</td><td>ID's, foto's, partijen, koppeling tussen bronnen</td><td>SPARQL</td><td>CC0</td><td><span class="lvl ok">Standaard</span></td></tr>
+        <tr><td>OpenSanctions PEP's</td><td>Politiek prominente personen, koppelingen</td><td>Bulk-download</td><td>CC BY-NC: gratis voor non-profit</td><td><span class="lvl mid">Optioneel</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="box"><h3>Grootste risico: privacywetgeving</h3><p>De Belgische gegevensbeschermingsautoriteit heeft in 2024 een beslissing genomen over Cumuleo (nr. 103/2024). Die lees ik vóór we Belgische mandaten tonen. Basisregels: alleen data over de publieke functie, officiële bron, recht op correctie, privacyverklaring.</p></div>
+    <div class="box"><h3>Grootste gat in de data</h3><p>Belgische politici hoeven lobbymeetings niet te publiceren. Het Kamerregister bevat enkel een paar tientallen organisaties. Voor België tonen we dus vooral mandaten, stemmingen en geld. Dat gat zelf benoemen in de app is ook een boodschap.</p></div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Stack &amp; architectuur</span>
+    <h2>Statische data, geen database nodig in de MVP</h2>
+    <p class="lede">De data verandert hooguit dagelijks. Een nachtelijke pipeline bouwt kant-en-klare JSON-bestanden en zet ze op Vercel Blob. De app leest die rechtstreeks van het CDN. Dat is snel, gratis en werkt offline.</p>
+  </div>
+  <div class="flow" style="margin-top:24px">
+    <div class="node"><b>Bronnen</b><span>EP API, transparantieregister, HowTheyVote, FTS, Wikidata</span></div>
+    <span class="arrow">→</span>
+    <div class="node"><b>Pipeline</b><span>GitHub Actions, elke nacht. TypeScript-scripts, zod-validatie</span></div>
+    <span class="arrow">→</span>
+    <div class="node hot"><b>Koppelen</b><span>Eén ID per persoon en organisatie: EP-ID, register-ID, Wikidata-QID</span></div>
+    <span class="arrow">→</span>
+    <div class="node"><b>Vercel Blob</b><span>JSON per dossier, zoekindex, Parquet voor geldstroom</span></div>
+    <span class="arrow">→</span>
+    <div class="node"><b>PWA</b><span>Vite, offline cache, deploy bij elke push</span></div>
+  </div>
+  <div class="stacklist" style="margin-top:28px">
+    <div class="sl"><span>App</span><span>Vite + React 19 + TypeScript strict</span></div>
+    <div class="sl"><span>Routing</span><span>TanStack Router (type-safe) + TanStack Query</span></div>
+    <div class="sl"><span>UI</span><span>Tailwind v4, Radix/shadcn-basis, Motion voor micro-animaties</span></div>
+    <div class="sl"><span>PWA</span><span>vite-plugin-pwa (Workbox), installeerbaar, offline dossiers</span></div>
+    <div class="sl"><span>Zoeken</span><span>MiniSearch in de browser, index als één bestand</span></div>
+    <div class="sl"><span>Geld-queries</span><span>DuckDB-WASM, enkel geladen op de Geld-pagina</span></div>
+    <div class="sl"><span>Talen</span><span>NL, FR, EN met Paraglide (type-safe vertalingen)</span></div>
+    <div class="sl"><span>Data</span><span>Vercel Blob (public). Postgres via Marketplace pas als accounts of push nodig zijn</span></div>
+    <div class="sl"><span>Kwaliteit</span><span>Vitest, Playwright, Biome, gitleaks, Lighthouse in CI</span></div>
+    <div class="sl"><span>Deploy</span><span>Vercel Hobby, git-integratie: elke push naar main gaat live</span></div>
+    <div class="sl"><span>Geheugen</span><span>CLAUDE.md + memory/STATUS.md, DECISIONS.md, LOG.md in de repo</span></div>
+    <div class="sl"><span>Git</span><span>Author sicparvisventures, commit + push na elke wijziging</span></div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Roadmap</span>
+    <h2>Van mockup naar volledige Belgische dekking</h2>
+  </div>
+  <div class="road" style="margin-top:24px">
+    <div class="ph now"><span class="eyebrow">Fase 0 · nu</span><b>Scope &amp; mockup</b><p>Deze pagina. Beslissingen hieronder. Repo en geheugen staan klaar.</p></div>
+    <div class="ph"><span class="eyebrow">Fase 1</span><b>MVP Europees Parlement</b><p>Dossiers voor alle 720 MEP's, focus op de 22 Belgische. Stemmingen, belangen, lobbymeetings, lobbyradar.</p></div>
+    <div class="ph"><span class="eyebrow">Fase 2</span><b>Geldstroom</b><p>FTS, Kohesio en TED voor België. Koppeling ontvanger ↔ lobbyorganisatie.</p></div>
+    <div class="ph"><span class="eyebrow">Fase 3</span><b>Belgische parlementen</b><p>Kamer (150) en Vlaams Parlement (124), mandatenlijsten, Kamer-lobbyregister.</p></div>
+    <div class="ph"><span class="eyebrow">Fase 4</span><b>Uitbreiden</b><p>Meldingen, vergelijken, embeds en een open API voor journalisten. Andere EU-landen.</p></div>
+  </div>
+</section>
+
+<!-- DECISIONS -->
+<section>
+  <div class="stack">
+    <span class="eyebrow">Jouw beslissingen</span>
+    <h2>Vijf vragen voor ik begin</h2>
+  </div>
+  <div class="dec" style="margin-top:24px">
+    <div class="d"><span class="n">1</span><div><b>Naam</b><p>Werktitel <b>Mandaat</b> (werkt in NL, FR en EN). Alternatieven: <b>Werkgever</b> (“jij bent de baas”) of <b>Publiek Dossier</b>. De repo heet nu <span class="mono">gangsters</span>.</p><p class="rec">Advies: Mandaat.</p></div></div>
+    <div class="d"><span class="n">2</span><div><b>Startniveau</b><p>Europees Parlement eerst (betrouwbare API, 22 Belgen, snel live), of meteen de Kamer (meer impact, maar moeilijke data).</p><p class="rec">Advies: Europa eerst, België als standaardfilter.</p></div></div>
+    <div class="d"><span class="n">3</span><div><b>Talen</b><p>Een Belgische app zonder Frans mist de helft van het land. Vertaling van labels is weinig werk als het vanaf dag één ingebouwd zit.</p><p class="rec">Advies: NL, FR en EN vanaf de start.</p></div></div>
+    <div class="d"><span class="n">4</span><div><b>Open source?</b><p>Een transparantie-app die zelf transparant is, is geloofwaardiger. Publieke repo met AGPL-3.0, zodat kopieën ook open blijven.</p><p class="rec">Advies: publiek, AGPL-3.0. Nu staat de repo nog privé.</p></div></div>
+    <div class="d"><span class="n">5</span><div><b>Visuele richting</b><p>Het dossier als omgekeerde eID-kaart: guilloche-patroon, stempelinkt, MRZ-regel onderaan, bronstempels als kleine labels. Strak en neutraal in de rest van de app.</p><p class="rec">Akkoord, of wil je een andere richting zien?</p></div></div>
+  </div>
+</section>
+
+<footer>
+  <p>Mandaat · scope en mockup v0.1 · 9 november 2026. Alle namen met * en alle bedragen zijn voorbeelddata. Bronnen: data.europarl.europa.eu, transparency-register.europa.eu, lobbyfacts.eu, github.com/HowTheyVote/data, kohesio.ec.europa.eu, ted.europa.eu, ws.vlpar.be, ccrek.be, opensanctions.org.</p>
+</footer>
+</div>
