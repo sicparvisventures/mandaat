@@ -7,6 +7,7 @@ _Laatst bijgewerkt: 2026-11-09_
 
 ## Gedaan
 - Repo geïnitialiseerd (author sicparvisventures), CLAUDE.md + memory/ opgezet.
+- GitHub-remote NOG NIET aangemaakt: `gh repo create` geblokkeerd door permissiecheck. Gebruiker moet dit doen of toestaan.
 - Bronnenonderzoek: EP Open Data API v2 geverifieerd (`/meps`, `/meps-declarations`, `/meetings/{id}/vote-results`, filter `country-of-representation=BE` werkt).
 - Mockup + scope-artifact: https://claude.ai/artifact/VJAGBmePNrmqXvjg5CBhgQ (bron: `docs/mockup/index.html`).
 
