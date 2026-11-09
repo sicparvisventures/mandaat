@@ -1,20 +1,53 @@
-import { ArrowUpRight, Star } from "@phosphor-icons/react";
+import { ArrowUpRight, Check, LinkSimple, Star } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { LangSwitch, REPORT_URL, ThemeSwitch } from "../components/Shell";
 import { EmptyState, PageHeader, PageSkeleton, Portrait, SectionTitle } from "../components/ui";
 import { useMeps, useMeta } from "../lib/data";
 import { useI18n } from "../lib/i18n";
-import { useWatchlist } from "../lib/watchlist";
+import { decodeShare, encodeShare, useWatchlist } from "../lib/watchlist";
 
 export function Follow() {
   const { t } = useI18n();
-  const { ids } = useWatchlist();
+  const { ids, merge } = useWatchlist();
   const meps = useMeps();
+  const [incoming, setIncoming] = useState(() => (typeof location === "undefined" ? [] : decodeShare(location.hash)));
+  const [copied, setCopied] = useState<"idle" | "copied" | "manual">("idle");
   if (meps.isPending) return <PageSkeleton />;
   const list = ids.map((id) => meps.data?.find((m) => m.id === id)).filter((m) => m != null);
+  const fresh = incoming.filter((id) => !ids.includes(id) && meps.data?.some((m) => m.id === id));
+  const shareUrl = `${location.origin}/volg${encodeShare(ids)}`;
+  const clearHash = () => {
+    history.replaceState(null, "", location.pathname);
+    setIncoming([]);
+  };
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={t("follow.title")} lede={t("follow.lede")} />
+      {fresh.length > 0 && (
+        <div className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+          <p className="flex-1 text-[14px]">{t("follow.importText", { n: fresh.length })}</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                await merge(fresh);
+                clearHash();
+              }}
+              className="press rounded-xl bg-stamp px-3.5 py-2 text-[13px] font-semibold text-stamp-ink"
+            >
+              {t("follow.import")}
+            </button>
+            <button
+              type="button"
+              onClick={clearHash}
+              className="press rounded-xl bg-sunken px-3.5 py-2 text-[13px] font-semibold"
+            >
+              {t("follow.ignore")}
+            </button>
+          </div>
+        </div>
+      )}
       {list.length === 0 ? (
         <EmptyState
           icon={<Star size={22} />}
@@ -26,20 +59,56 @@ export function Follow() {
           }
         />
       ) : (
-        <ul className="grid gap-2.5 sm:grid-cols-2">
-          {list.map((m) => (
-            <li key={m.id}>
-              <Link to="/dossier/$id" params={{ id: m.id }} className="press card flex items-center gap-3 p-3">
-                <Portrait id={m.id} name={m.name} className="h-[60px] w-12 rounded-[8px]" />
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span className="truncate font-semibold">{m.name}</span>
-                  <span className="truncate text-[12.5px] text-muted">{m.groupLabel ?? m.group}</span>
-                </span>
-                <span className="display tnum text-[22px]">{m.meetings12m}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <div className="flex flex-col gap-2 rounded-2xl bg-sunken p-4">
+            <p className="text-[13.5px] text-muted">{t("follow.shareText")}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    setCopied("copied");
+                  } catch {
+                    setCopied("manual");
+                  }
+                }}
+                className="press inline-flex items-center gap-1.5 rounded-xl bg-ink px-3.5 py-2 text-[13px] font-semibold text-paper"
+              >
+                {copied === "copied" ? (
+                  <Check size={14} weight="bold" aria-hidden />
+                ) : (
+                  <LinkSimple size={14} weight="bold" aria-hidden />
+                )}
+                {copied === "copied" ? t("follow.copied") : t("follow.share")}
+              </button>
+              {copied === "manual" && (
+                <input
+                  id="share-url"
+                  readOnly
+                  value={shareUrl}
+                  onFocus={(e) => e.currentTarget.select()}
+                  aria-label={t("follow.share")}
+                  className="card min-w-0 flex-1 rounded-xl px-3 py-2 font-mono text-[12px]"
+                />
+              )}
+            </div>
+          </div>
+          <ul className="grid gap-2.5 sm:grid-cols-2">
+            {list.map((m) => (
+              <li key={m.id}>
+                <Link to="/dossier/$id" params={{ id: m.id }} className="press card flex items-center gap-3 p-3">
+                  <Portrait id={m.id} name={m.name} className="h-[60px] w-12 rounded-[8px]" />
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate font-semibold">{m.name}</span>
+                    <span className="truncate text-[12.5px] text-muted">{m.groupLabel ?? m.group}</span>
+                  </span>
+                  <span className="display tnum text-[22px]">{m.meetings12m}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

@@ -32,3 +32,13 @@ describe("mrzLines", () => {
     expect(b).toHaveLength(36);
   });
 });
+
+import { decodeShare, encodeShare } from "../src/lib/watchlist";
+
+describe("share link", () => {
+  it("round-trips ids and rejects junk", () => {
+    expect(decodeShare(encodeShare(["130100", "124973"]))).toEqual(["130100", "124973"]);
+    expect(decodeShare("#l=130100.<script>.124973")).toEqual(["130100", "124973"]);
+    expect(decodeShare("#other")).toEqual([]);
+  });
+});
