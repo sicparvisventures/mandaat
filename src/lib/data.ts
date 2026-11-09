@@ -10,6 +10,8 @@ import type {
   OrgSummary,
   RecipientDossier,
   SearchDoc,
+  VpDossier,
+  VpSummary,
 } from "./types";
 
 export const DATA_BASE = (import.meta.env.VITE_DATA_BASE_URL as string | undefined)?.replace(/\/$/, "") || "/data";
@@ -64,6 +66,17 @@ export const qMoney = {
       staleTime: DAY / 4,
     }),
 };
+
+export const qVp = {
+  list: () => queryOptions({ queryKey: ["vp"], queryFn: () => getJson<VpSummary[]>("vp.json"), staleTime: DAY / 4 }),
+  dossier: (id: string) =>
+    queryOptions({
+      queryKey: ["vp", id],
+      queryFn: () => getJson<VpDossier>(`vp/${id.replace(/^vp-/, "")}.json`),
+      staleTime: DAY / 4,
+    }),
+};
+export const useVp = () => useQuery(qVp.list());
 
 export const useMeta = () => useQuery(q.meta());
 export const useMeps = () => useQuery(q.meps());

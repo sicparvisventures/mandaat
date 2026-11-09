@@ -1,9 +1,9 @@
-import { Handshake } from "@phosphor-icons/react";
+import { ArrowRight, Handshake } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ErrorState, PageSkeleton, Portrait, RankList, SectionTitle, SourceStamp, TextLink } from "../components/ui";
-import { q, useMeps, useMeta } from "../lib/data";
+import { q, useMeps, useMeta, useVp } from "../lib/data";
 import { useI18n } from "../lib/i18n";
 import type { FeedItem } from "../lib/types";
 
@@ -11,6 +11,7 @@ export function Home() {
   const { t, date } = useI18n();
   const meps = useMeps();
   const meta = useMeta();
+  const vp = useVp();
   const feed = useQuery(q.feed());
   const [scope, setScope] = useState<"BE" | "ALL">("BE");
 
@@ -64,6 +65,17 @@ export function Home() {
           ))}
         </ul>
       </section>
+
+      {vp.data && (
+        <Link
+          to="/dossiers"
+          search={{ inst: "vp" }}
+          className="press card -mt-4 flex items-center gap-3 p-4 text-[14px] hover:shadow-[0_0_0_1px_var(--stamp)]"
+        >
+          <span className="flex-1">{t("home.vpLink", { n: vp.data.length })}</span>
+          <ArrowRight size={16} weight="bold" className="shrink-0 text-stamp" aria-hidden />
+        </Link>
+      )}
 
       <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:gap-8">
         <section className="flex min-w-0 flex-col gap-4">

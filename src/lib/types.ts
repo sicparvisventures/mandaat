@@ -130,7 +130,7 @@ export type Meta = {
 
 export type SearchDoc = {
   id: string;
-  kind: "mep" | "org" | "recipient";
+  kind: "mep" | "org" | "recipient" | "vp";
   name: string;
   sub: string;
 };
@@ -199,4 +199,39 @@ export type MoneyOverview = {
     byWinner: { id: string; name: string; count: number }[];
   };
   topRecipients: RecipientSummary[];
+};
+
+/* ---------------- Vlaams Parlement (phase 3) ---------------- */
+
+export type VpSummary = {
+  /** "vp-<id>" */
+  id: string;
+  name: string;
+  sort: string;
+  party: string;
+  partyColor: string | null;
+  district: string;
+  plenaryPresent: number | null;
+  plenaryExcused: number | null;
+  questions: number | null;
+  otherMandates: number;
+  /** Share of named plenary votes in which the member voted */
+  voteAttendance: number | null;
+};
+
+export type VpDossier = VpSummary & {
+  since: string | null;
+  committees: { code: string; title: string; role: string; start: string | null }[];
+  mandates: { group: string; title: string; start: string | null; end: string | null }[];
+  career: { title: string; employer: string | null; start: string | null; end: string | null }[];
+  votes: {
+    total: number;
+    present: number;
+    for: number;
+    against: number;
+    abstention: number;
+    recent: VoteRecord[];
+  } | null;
+  links: { vp: string };
+  sources: SourceRef[];
 };

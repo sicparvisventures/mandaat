@@ -42,3 +42,37 @@ describe("share link", () => {
     expect(decodeShare("#other")).toEqual([]);
   });
 });
+
+import { normName, parseHandelingen } from "../pipeline/vlaams";
+
+describe("Vlaams Parlement Handelingen", () => {
+  const text = [
+    "ONTWERP VAN DECREET over de subsidiëring van stages",
+    "– 925 (2025-2026) – Nrs. 1 en 2",
+    "De voorzitter: aan de orde is de hoofdelijke stemming over artikel 3.",
+    "Stemming nr. 1",
+    "Het Vlaams Parlement neemt het artikel aan.",
+    "Individuele stemmingen Vlaamse Volksvertegenwoordigers",
+    "Stemming nr. 1:",
+    "JA-stemmen:",
+    "Hannes Anaf, Dominiek Lootens-",
+    "Stael, Jos D'Haese",
+    "NEEN-stemmen:",
+    "Tom Van Grieken",
+    "Vlaams Parlement",
+    "ONTHOUDINGEN:",
+    "Suzy Wouters",
+  ].join("\n");
+  it("parses names, title and result", () => {
+    const [v] = parseHandelingen(text);
+    expect(v?.yes).toEqual(["Hannes Anaf", "Dominiek Lootens-Stael", "Jos D'Haese"]);
+    expect(v?.no).toEqual(["Tom Van Grieken"]);
+    expect(v?.abst).toEqual(["Suzy Wouters"]);
+    expect(v?.result).toBe("ADOPTED");
+    expect(v?.title).toBe("Artikel 3, ontwerp van decreet over de subsidiëring van stages");
+  });
+  it("normalises names to letters only", () => {
+    expect(normName("Jos D'Haese")).toBe(normName("Jos DHaese"));
+    expect(normName("Koen Daniëls")).toBe("koendaniels");
+  });
+});

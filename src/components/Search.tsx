@@ -37,7 +37,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
     const id = rest.join(":");
     onOpenChange(false);
     setTerm("");
-    if (r.kind === "mep") navigate({ to: "/dossier/$id", params: { id } });
+    if (r.kind === "mep" || r.kind === "vp") navigate({ to: "/dossier/$id", params: { id } });
     else if (r.kind === "recipient") navigate({ to: "/geld/$id", params: { id } });
     else navigate({ to: "/lobby/$id", params: { id } });
   };
@@ -93,7 +93,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
                   onClick={() => go(r)}
                   className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left ${i === active ? "bg-stamp-soft" : ""}`}
                 >
-                  {r.kind === "mep" ? (
+                  {r.kind === "mep" || r.kind === "vp" ? (
                     <IdentificationCard size={18} className="shrink-0 text-stamp" aria-hidden />
                   ) : r.kind === "recipient" ? (
                     <Coins size={18} className="shrink-0 text-muted" aria-hidden />

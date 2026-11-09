@@ -4,7 +4,18 @@ import { type ReactNode, useEffect, useState } from "react";
 import { photoUrl } from "../lib/data";
 import { useI18n } from "../lib/i18n";
 
-export function Portrait({ id, name, className = "" }: { id: string; name: string; className?: string }) {
+export function Portrait({
+  id,
+  name,
+  src,
+  className = "",
+}: {
+  id: string;
+  name: string;
+  /** undefined: official EP photo by id. null: no licensed photo, show initials. */
+  src?: string | null;
+  className?: string;
+}) {
   const [failed, setFailed] = useState(false);
   const initials = name
     .split(/\s+/)
@@ -12,7 +23,7 @@ export function Portrait({ id, name, className = "" }: { id: string; name: strin
     .slice(0, 2)
     .map((p) => p[0])
     .join("");
-  if (failed) {
+  if (failed || src === null || (src === undefined && id.startsWith("vp-"))) {
     return (
       <div
         aria-hidden
@@ -24,7 +35,7 @@ export function Portrait({ id, name, className = "" }: { id: string; name: strin
   }
   return (
     <img
-      src={photoUrl(id)}
+      src={src ?? photoUrl(id)}
       alt=""
       loading="lazy"
       decoding="async"

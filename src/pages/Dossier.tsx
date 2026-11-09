@@ -9,12 +9,14 @@ import { NotFoundError, q } from "../lib/data";
 import { type Key, useI18n } from "../lib/i18n";
 import type { MepDossier, VoteRecord } from "../lib/types";
 import { useWatchlist } from "../lib/watchlist";
+import { VpDossierPage } from "./VpDossier";
 
 /** Net monthly salary of an MEP as reported by Euronews on 7 Oct 2026. Shown with its source on /bronnen. */
 export const MEP_SALARY_NET_EUR = 8772.7;
 
 export function DossierRoute() {
   const { id } = useParams({ strict: false }) as { id: string };
+  if (id.startsWith("vp-")) return <VpDossierPage key={id} id={id} />;
   return <Dossier key={id} id={id} />;
 }
 
@@ -31,7 +33,7 @@ export function Dossier({ id }: { id: string }) {
 }
 
 function DossierView({ d }: { d: MepDossier }) {
-  const { t, locale } = useI18n();
+  const { t, locale, date } = useI18n();
   const watch = useWatchlist();
   const following = watch.has(d.id);
   const salary = new Intl.NumberFormat(locale, { style: "currency", currency: "EUR" }).format(MEP_SALARY_NET_EUR);
@@ -59,7 +61,18 @@ function DossierView({ d }: { d: MepDossier }) {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-8">
         <div className="enter flex min-w-0 flex-col gap-3">
-          <IdCard mep={d} since={d.since} salary={salary} />
+          <IdCard
+            person={d}
+            institution={t("card.institution")}
+            since={d.since}
+            fields={[
+              [t("card.group"), d.groupLabel ?? d.group ?? "-"],
+              [t("card.party"), d.party ?? "-"],
+              [t("card.since"), d.since ? date(d.since) : "-"],
+              [t("card.employer"), t("card.employerValue")],
+              [t("card.salary"), salary],
+            ]}
+          />
           <div className="grid grid-cols-3 gap-2">
             <Stat value={d.meetings12m} label={t("dossier.meetings12")} />
             <Stat

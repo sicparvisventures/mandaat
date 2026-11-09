@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { countryName, ErrorState, PageHeader, PageSkeleton, Portrait } from "../components/ui";
-import { useMeps } from "../lib/data";
+import { useMeps, useVp } from "../lib/data";
 import { useI18n } from "../lib/i18n";
 
 function readPref(key: string, fallback: string) {
@@ -20,6 +20,136 @@ function writePref(key: string, v: string) {
 }
 
 export function Dossiers() {
+  const { t } = useI18n();
+  const { inst } = useSearch({ strict: false }) as { inst?: "vp" };
+  const navigate = useNavigate();
+  const current = inst === "vp" ? "vp" : "ep";
+  return (
+    <div className="flex flex-col gap-6">
+      <fieldset className="flex gap-1 self-start rounded-xl bg-sunken p-1">
+        <legend className="sr-only">{t("dossiers.title")}</legend>
+        {(["ep", "vp"] as const).map((k) => (
+          <button
+            key={k}
+            type="button"
+            aria-pressed={current === k}
+            onClick={() => navigate({ to: "/dossiers", search: k === "vp" ? { inst: "vp" } : {}, replace: true })}
+            className={`press rounded-lg px-3.5 py-2 text-[13px] font-semibold ${current === k ? "bg-surface text-ink shadow-[0_0_0_1px_var(--line)]" : "text-muted hover:text-ink"}`}
+          >
+            {t(k === "ep" ? "inst.ep" : "inst.vp")}
+          </button>
+        ))}
+      </fieldset>
+      {current === "vp" ? <VpList /> : <EpList />}
+    </div>
+  );
+}
+
+function VpList() {
+  const { t } = useI18n();
+  const vp = useVp();
+  const [party, setParty] = useState(() => readPref("mandaat.f.vpParty", ""));
+  const [district, setDistrict] = useState(() => readPref("mandaat.f.vpDistrict", ""));
+  const parties = useMemo(() => [...new Set((vp.data ?? []).map((m) => m.party))].sort(), [vp.data]);
+  const districts = useMemo(() => [...new Set((vp.data ?? []).map((m) => m.district))].sort(), [vp.data]);
+  const list = useMemo(
+    () => (vp.data ?? []).filter((m) => (!party || m.party === party) && (!district || m.district === district)),
+    [vp.data, party, district],
+  );
+  if (vp.isPending) return <PageSkeleton />;
+  if (vp.isError) return <ErrorState onRetry={() => vp.refetch()} />;
+  return (
+    <>
+      <PageHeader title={t("inst.vp")} lede={t("vp.lede", { n: vp.data.length })} />
+      <div className="grid grid-cols-2 gap-2.5 sm:max-w-xl sm:gap-3">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="f-vp-party" className="label">
+            {t("vp.fractie")}
+          </label>
+          <select
+            id="f-vp-party"
+            value={party}
+            style={caret}
+            className={selectCls}
+            onChange={(e) => {
+              setParty(e.target.value);
+              writePref("mandaat.f.vpParty", e.target.value);
+            }}
+          >
+            <option value="">{t("dossiers.allGroups")}</option>
+            {parties.map((p) => (
+              <option key={p} value={p}>
+                {p}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="f-vp-district" className="label">
+            {t("vp.district")}
+          </label>
+          <select
+            id="f-vp-district"
+            value={district}
+            style={caret}
+            className={selectCls}
+            onChange={(e) => {
+              setDistrict(e.target.value);
+              writePref("mandaat.f.vpDistrict", e.target.value);
+            }}
+          >
+            <option value="">{t("vp.allDistricts")}</option>
+            {districts.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <p className="font-mono text-[12px] text-muted" aria-live="polite">
+        {t("dossiers.count", { n: list.length })}
+      </p>
+      <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+        {list.map((m) => (
+          <li key={m.id}>
+            <Link
+              to="/dossier/$id"
+              params={{ id: m.id }}
+              className="press card flex items-center gap-3 p-3 hover:shadow-[0_0_0_1px_var(--stamp)]"
+            >
+              <span
+                aria-hidden
+                className="h-[60px] w-1.5 shrink-0 rounded-full"
+                style={{ background: m.partyColor ?? "var(--line)" }}
+              />
+              <Portrait id={m.id} name={m.name} src={null} className="h-[60px] w-12 shrink-0 rounded-[8px]" />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-[14.5px] font-semibold">{m.name}</span>
+                <span className="truncate text-[12.5px] text-muted">
+                  {m.party}, {m.district}
+                </span>
+              </span>
+              <span className="flex shrink-0 flex-col items-end">
+                <span className="display tnum text-[22px] leading-none">{m.questions ?? "-"}</span>
+                <span className="text-[10.5px] text-faint">{t("vp.questions")}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+const selectCls =
+  "card w-full appearance-none rounded-xl bg-surface px-3 py-2.5 pr-8 text-[14px] font-medium bg-[length:12px] bg-[right_12px_center] bg-no-repeat";
+const caret = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23888' d='M213.7 101.7l-80 80a8 8 0 0 1-11.4 0l-80-80a8 8 0 0 1 11.4-11.4L128 164.7l74.3-74.4a8 8 0 0 1 11.4 11.4Z'/%3E%3C/svg%3E\")",
+};
+
+function EpList() {
   const { t, locale } = useI18n();
   const meps = useMeps();
   const [country, setCountry] = useState(() => readPref("mandaat.f.country", "BE"));
@@ -50,16 +180,9 @@ export function Dossiers() {
   if (meps.isPending) return <PageSkeleton />;
   if (meps.isError) return <ErrorState onRetry={() => meps.refetch()} />;
 
-  const selectCls =
-    "card w-full appearance-none rounded-xl bg-surface px-3 py-2.5 pr-8 text-[14px] font-medium bg-[length:12px] bg-[right_12px_center] bg-no-repeat";
-  const caret = {
-    backgroundImage:
-      "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23888' d='M213.7 101.7l-80 80a8 8 0 0 1-11.4 0l-80-80a8 8 0 0 1 11.4-11.4L128 164.7l74.3-74.4a8 8 0 0 1 11.4 11.4Z'/%3E%3C/svg%3E\")",
-  };
-
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={t("dossiers.title")} lede={t("dossiers.lede", { n: meps.data.length })} />
+      <PageHeader title={t("inst.ep")} lede={t("dossiers.lede", { n: meps.data.length })} />
       <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="f-country" className="label">

@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { LangSwitch, REPORT_URL, ThemeSwitch } from "../components/Shell";
 import { EmptyState, PageHeader, PageSkeleton, Portrait, SectionTitle } from "../components/ui";
-import { useMeps, useMeta } from "../lib/data";
+import { useMeps, useMeta, useVp } from "../lib/data";
 import { useI18n } from "../lib/i18n";
 import { decodeShare, encodeShare, useWatchlist } from "../lib/watchlist";
 
@@ -11,11 +11,20 @@ export function Follow() {
   const { t } = useI18n();
   const { ids, merge } = useWatchlist();
   const meps = useMeps();
+  const vp = useVp();
   const [incoming, setIncoming] = useState(() => (typeof location === "undefined" ? [] : decodeShare(location.hash)));
   const [copied, setCopied] = useState<"idle" | "copied" | "manual">("idle");
   if (meps.isPending) return <PageSkeleton />;
-  const list = ids.map((id) => meps.data?.find((m) => m.id === id)).filter((m) => m != null);
-  const fresh = incoming.filter((id) => !ids.includes(id) && meps.data?.some((m) => m.id === id));
+  type Row = { id: string; name: string; sub: string; n: number | null };
+  const resolve = (id: string): Row | null => {
+    const m = meps.data?.find((x) => x.id === id);
+    if (m) return { id, name: m.name, sub: m.groupLabel ?? m.group ?? "", n: m.meetings12m };
+    const v = vp.data?.find((x) => x.id === id);
+    if (v) return { id, name: v.name, sub: `${v.party}, Vlaams Parlement`, n: v.questions };
+    return null;
+  };
+  const list = ids.map(resolve).filter((m) => m != null);
+  const fresh = incoming.filter((id) => !ids.includes(id) && resolve(id) != null);
   const shareUrl = `${location.origin}/volg${encodeShare(ids)}`;
   const clearHash = () => {
     history.replaceState(null, "", location.pathname);
@@ -101,9 +110,9 @@ export function Follow() {
                   <Portrait id={m.id} name={m.name} className="h-[60px] w-12 rounded-[8px]" />
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="truncate font-semibold">{m.name}</span>
-                    <span className="truncate text-[12.5px] text-muted">{m.groupLabel ?? m.group}</span>
+                    <span className="truncate text-[12.5px] text-muted">{m.sub}</span>
                   </span>
-                  <span className="display tnum text-[22px]">{m.meetings12m}</span>
+                  {m.n != null && <span className="display tnum text-[22px]">{m.n}</span>}
                 </Link>
               </li>
             ))}
@@ -128,10 +137,10 @@ const COPY = {
     ],
     limits: "Wat je hier niet ziet",
     limitsText:
-      "Lobbymeetings worden door Europarlementsleden zelf gepubliceerd. Ontbrekende meetings zijn dus niet zichtbaar. Belgische federale en regionale parlementsleden hoeven hun meetings niet te publiceren; zij komen in een volgende fase, met mandaten en stemmingen.",
+      "Lobbymeetings worden door Europarlementsleden zelf gepubliceerd. Ontbrekende meetings zijn dus niet zichtbaar. Belgische parlementsleden hoeven hun meetings niet te publiceren. Voor het Vlaams Parlement tonen we daarom stemmingen, mandaten en aanwezigheid; de Kamer volgt. Foto's van Vlaamse volksvertegenwoordigers tonen we pas na toestemming.",
     salary: "Loon op de ID-kaart",
     salaryText:
-      "Netto maandloon van een Europarlementslid, € 8.772,70, zoals gerapporteerd door Euronews op 7 oktober 2026. Vergoedingen komen daar bovenop.",
+      "Europarlementslid: netto € 8.772,70 per maand, zoals gerapporteerd door Euronews op 7 oktober 2026; vergoedingen komen daar bovenop. Vlaams Parlement: € 80.881 bruto per jaar, de parlementaire vergoeding volgens de mandatenlijst 2024 van het Rekenhof.",
     settings: "Instellingen",
     open: "Open source",
     openText:
@@ -153,10 +162,10 @@ const COPY = {
     ],
     limits: "Ce que vous ne voyez pas ici",
     limitsText:
-      "Les réunions de lobbying sont publiées par les députés européens eux-mêmes. Les réunions non publiées n'apparaissent donc pas. Les parlementaires belges fédéraux et régionaux ne doivent pas publier leurs réunions ; ils suivront dans une prochaine phase, avec mandats et votes.",
+      "Les réunions de lobbying sont publiées par les députés européens eux-mêmes. Les réunions non publiées n'apparaissent donc pas. Les parlementaires belges ne doivent pas publier leurs réunions. Pour le Parlement flamand, nous montrons donc votes, mandats et présence ; la Chambre suivra. Les photos des députés flamands n'apparaîtront qu'après autorisation.",
     salary: "Salaire sur la carte",
     salaryText:
-      "Salaire mensuel net d'un député européen, 8 772,70 €, selon Euronews le 7 octobre 2026. Les indemnités s'y ajoutent.",
+      "Député européen : 8 772,70 € net par mois, selon Euronews le 7 octobre 2026 ; les indemnités s'y ajoutent. Parlement flamand : 80 881 € brut par an, l'indemnité parlementaire selon la liste des mandats 2024 de la Cour des comptes.",
     settings: "Réglages",
     open: "Open source",
     openText:
@@ -172,10 +181,10 @@ const COPY = {
     ],
     limits: "What you don't see here",
     limitsText:
-      "Lobby meetings are published by MEPs themselves, so unpublished meetings don't show up. Belgian federal and regional members of parliament don't have to publish their meetings; they come in a later phase, with mandates and votes.",
+      "Lobby meetings are published by MEPs themselves, so unpublished meetings don't show up. Belgian members of parliament don't have to publish their meetings. For the Flemish Parliament we therefore show votes, mandates and attendance; the federal Chamber follows. Photos of Flemish MPs appear only after permission.",
     salary: "Salary on the ID card",
     salaryText:
-      "Net monthly salary of an MEP, €8,772.70, as reported by Euronews on 7 October 2026. Allowances come on top.",
+      "MEP: €8,772.70 net per month, as reported by Euronews on 7 October 2026; allowances come on top. Flemish Parliament: €80,881 gross per year, the parliamentary allowance in the Court of Audit's 2024 mandate list.",
     settings: "Settings",
     open: "Open source",
     openText:

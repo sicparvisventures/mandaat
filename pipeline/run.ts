@@ -31,6 +31,7 @@ import {
   register,
 } from "./sources";
 import { log, norm, OUT, slug, writeOut } from "./util";
+import { buildVlaams } from "./vlaams";
 
 const TERM_START = "2024-07-16";
 const now = new Date();
@@ -414,6 +415,10 @@ async function main() {
   for (const o of orgSummaries) if (o.registerId) lobbyByName.set(norm(o.name), o.id);
   const moneyRes = await buildMoney(lobbyByName);
   search.push(...moneyRes.search);
+
+  /* 9. Vlaams Parlement */
+  const vp = await buildVlaams();
+  search.push(...vp.search);
   writeOut("search.json", search);
   const totalMeetings = [...meetingsByMep.values()].reduce((n, a) => n + a.length, 0);
   const meta: Meta = {
@@ -453,6 +458,7 @@ async function main() {
         records: htv.votes.size,
       },
       ...moneyRes.meta,
+      vp.meta,
       {
         key: "ec",
         name: "European Commission, meetings with interest representatives",

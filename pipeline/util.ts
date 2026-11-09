@@ -29,19 +29,24 @@ export async function fetchRetry(url: string, init: RequestInit = {}, tries = 4)
 }
 
 /** Download to data/raw with a max age, so local reruns don't hammer the sources. */
-export async function cached(name: string, url: string, maxAgeH = 20): Promise<string> {
+export async function cached(
+  name: string,
+  url: string,
+  maxAgeH = 20,
+  headers: Record<string, string> = {},
+): Promise<string> {
   const path = join(RAW, name);
   if (existsSync(path) && Date.now() - statSync(path).mtimeMs < maxAgeH * 3600_000) return path;
   mkdirSync(dirname(path), { recursive: true });
   log("download", name);
-  const res = await fetchRetry(url);
+  const res = await fetchRetry(url, { headers });
   if (!res.ok) throw new Error(`${res.status} ${url}`);
   writeFileSync(path, Buffer.from(await res.arrayBuffer()));
   return path;
 }
 
 export async function cachedJson<T>(name: string, url: string, maxAgeH = 20): Promise<T> {
-  return JSON.parse(readFileSync(await cached(name, url, maxAgeH), "utf8")) as T;
+  return JSON.parse(readFileSync(await cached(name, url, maxAgeH, { accept: "application/json" }), "utf8")) as T;
 }
 
 export async function pool<T, R>(items: T[], n: number, fn: (t: T, i: number) => Promise<R>): Promise<R[]> {

@@ -9,6 +9,7 @@ const home = createRoute({ getParentRoute: () => root, path: "/", component: Hom
 const dossiers = createRoute({
   getParentRoute: () => root,
   path: "/dossiers",
+  validateSearch: (s: Record<string, unknown>): { inst?: "vp" } => (s.inst === "vp" ? { inst: "vp" } : {}),
   component: lazyRouteComponent(() => import("./pages/Dossiers"), "Dossiers"),
 });
 const dossier = createRoute({
