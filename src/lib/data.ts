@@ -1,6 +1,16 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import { orgShard } from "./shard";
-import type { FeedItem, MepDossier, MepSummary, Meta, OrgDossier, OrgSummary, SearchDoc } from "./types";
+import { orgShard, recipientShard } from "./shard";
+import type {
+  FeedItem,
+  MepDossier,
+  MepSummary,
+  Meta,
+  MoneyOverview,
+  OrgDossier,
+  OrgSummary,
+  RecipientDossier,
+  SearchDoc,
+} from "./types";
 
 export const DATA_BASE = (import.meta.env.VITE_DATA_BASE_URL as string | undefined)?.replace(/\/$/, "") || "/data";
 
@@ -34,6 +44,22 @@ export const q = {
         const o = shard[id];
         if (!o) throw new NotFoundError(id);
         return o;
+      },
+      staleTime: DAY / 4,
+    }),
+};
+
+export const qMoney = {
+  money: () =>
+    queryOptions({ queryKey: ["money"], queryFn: () => getJson<MoneyOverview>("money.json"), staleTime: DAY / 4 }),
+  recipient: (id: string) =>
+    queryOptions({
+      queryKey: ["recipient", id],
+      queryFn: async () => {
+        const shard = await getJson<Record<string, RecipientDossier>>(`recipient/${recipientShard(id)}.json`);
+        const r = shard[id];
+        if (!r) throw new NotFoundError(id);
+        return r;
       },
       staleTime: DAY / 4,
     }),

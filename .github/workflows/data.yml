@@ -16,12 +16,15 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      # Member details and EP body names change rarely: reuse them for a week to spare the EP API.
+      # Slow-changing sources are cached between runs: EP member details and body names (pipeline
+      # refreshes them after 3 and 30 days) and the yearly FTS files (~300 MB, refreshed after 30 days).
       - uses: actions/cache@v4
         with:
-          path: data/raw/ep
-          key: ep-${{ github.run_id }}
-          restore-keys: ep-
+          path: |
+            data/raw/ep
+            data/raw/fts
+          key: raw-${{ github.run_id }}
+          restore-keys: raw-
       - run: pnpm pipeline
       - run: pnpm pipeline:upload
         env:

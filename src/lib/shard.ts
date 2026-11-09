@@ -9,3 +9,5 @@ export function orgShard(id: string): string {
   }
   return ((h >>> 0) % ORG_SHARDS).toString(16).padStart(2, "0");
 }
+
+export const recipientShard = (id: string) => orgShard(`r:${id}`);

@@ -37,7 +37,18 @@ const sources = createRoute({
   component: lazyRouteComponent(() => import("./pages/Static"), "Sources"),
 });
 
-const routeTree = root.addChildren([home, dossiers, dossier, lobby, org, follow, sources]);
+const money = createRoute({
+  getParentRoute: () => root,
+  path: "/geld",
+  component: lazyRouteComponent(() => import("./pages/Money"), "Money"),
+});
+const recipient = createRoute({
+  getParentRoute: () => root,
+  path: "/geld/$id",
+  component: lazyRouteComponent(() => import("./pages/Money"), "RecipientRoute"),
+});
+
+const routeTree = root.addChildren([home, dossiers, dossier, lobby, org, money, recipient, follow, sources]);
 
 export const router = createRouter({
   routeTree,

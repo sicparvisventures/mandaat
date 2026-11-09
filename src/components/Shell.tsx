@@ -1,4 +1,15 @@
-import { BookOpen, Flag, Handshake, House, IdentificationCard, Monitor, Moon, Star, Sun } from "@phosphor-icons/react";
+import {
+  BookOpen,
+  Coins,
+  Flag,
+  Handshake,
+  House,
+  IdentificationCard,
+  Monitor,
+  Moon,
+  Star,
+  Sun,
+} from "@phosphor-icons/react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { type ComponentType, lazy, Suspense, useCallback, useState } from "react";
 import { type Key, LANGS, useI18n } from "../lib/i18n";
@@ -15,6 +26,7 @@ const NAV: { to: string; key: Key; long?: Key; icon: IconType; exact?: boolean }
   { to: "/", key: "nav.today", icon: House, exact: true },
   { to: "/dossiers", key: "nav.dossiers", icon: IdentificationCard },
   { to: "/lobby", key: "nav.lobby", long: "nav.lobbyLong", icon: Handshake },
+  { to: "/geld", key: "nav.money", long: "nav.moneyLong", icon: Coins },
   { to: "/volg", key: "nav.follow", long: "nav.followLong", icon: Star },
 ];
 
@@ -159,6 +171,14 @@ export function Shell() {
           </Link>
           <div className="flex items-center gap-2">
             <LangSwitch />
+            <Link
+              to="/bronnen"
+              aria-label={t("nav.sources")}
+              title={t("nav.sources")}
+              className={`press grid size-9 place-items-center rounded-lg ${isActive("/bronnen") ? "bg-stamp-soft text-stamp" : "text-muted hover:text-ink"}`}
+            >
+              <BookOpen size={19} weight={isActive("/bronnen") ? "fill" : "regular"} />
+            </Link>
           </div>
         </header>
 
@@ -189,24 +209,22 @@ export function Shell() {
             paddingRight: "env(safe-area-inset-right, 0px)",
           }}
         >
-          {[...NAV, { to: "/bronnen", key: "nav.sources" as Key, icon: BookOpen, exact: false }].map(
-            ({ to, key, icon: Icon, exact }) => {
-              const on = isActive(to, exact);
-              const label = key === "nav.sources" ? t("dossier.tabSources") : t(key);
-              return (
-                <Link
-                  key={to}
-                  // biome-ignore lint/suspicious/noExplicitAny: static nav targets
-                  to={to as any}
-                  aria-current={on ? "page" : undefined}
-                  className={`press flex min-h-14 flex-col items-center justify-center gap-0.5 pt-2 text-[10.5px] font-semibold ${on ? "text-stamp" : "text-muted"}`}
-                >
-                  <Icon size={22} weight={on ? "fill" : "regular"} />
-                  {label}
-                </Link>
-              );
-            },
-          )}
+          {NAV.map(({ to, key, icon: Icon, exact }) => {
+            const on = isActive(to, exact);
+            const label = t(key);
+            return (
+              <Link
+                key={to}
+                // biome-ignore lint/suspicious/noExplicitAny: static nav targets
+                to={to as any}
+                aria-current={on ? "page" : undefined}
+                className={`press flex min-h-14 flex-col items-center justify-center gap-0.5 pt-2 text-[10.5px] font-semibold ${on ? "text-stamp" : "text-muted"}`}
+              >
+                <Icon size={22} weight={on ? "fill" : "regular"} />
+                {label}
+              </Link>
+            );
+          })}
         </nav>
       </div>
 

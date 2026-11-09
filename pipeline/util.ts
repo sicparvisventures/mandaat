@@ -122,3 +122,65 @@ export const tag = (block: string, name: string): string | null => {
   const m = block.match(new RegExp(`<${name}(?:\\s[^>]*)?>([\\s\\S]*?)</${name}>`));
   return m?.[1] != null ? decodeXml(m[1].trim()) : null;
 };
+
+/** Full CSV parser (quoted fields may contain commas, quotes and newlines). Yields rows as string arrays. */
+export function* parseCsv(text: string): Generator<string[]> {
+  let row: string[] = [];
+  let cur = "";
+  let q = false;
+  const n = text.length;
+  for (let i = 0; i < n; i++) {
+    const c = text.charCodeAt(i);
+    if (q) {
+      if (c === 34) {
+        if (text.charCodeAt(i + 1) === 34) {
+          cur += '"';
+          i++;
+        } else q = false;
+      } else cur += text[i];
+    } else if (c === 34) q = true;
+    else if (c === 44) {
+      row.push(cur);
+      cur = "";
+    } else if (c === 10 || c === 13) {
+      if (c === 13 && text.charCodeAt(i + 1) === 10) i++;
+      row.push(cur);
+      cur = "";
+      if (row.length > 1 || row[0] !== "") yield row;
+      row = [];
+    } else cur += text[i];
+  }
+  if (cur !== "" || row.length) {
+    row.push(cur);
+    yield row;
+  }
+}
+
+/** Iterate CSV rows as objects keyed by header. */
+export function* csvObjects(text: string): Generator<Record<string, string>> {
+  let header: string[] | null = null;
+  for (const r of parseCsv(text)) {
+    if (!header) {
+      header = r.map((h) => h.replace(/^﻿/, "").trim());
+      continue;
+    }
+    const o: Record<string, string> = {};
+    for (let i = 0; i < header.length; i++) o[header[i] as string] = r[i] ?? "";
+    yield o;
+  }
+}
+
+export const money = (s: string | undefined) => {
+  if (!s) return 0;
+  const n = Number(s.replace(/,/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+
+/** Belgian company number (KBO/BCE), 10 digits, from VAT ("BE0672423992") or dotted ("0207.301.767"). */
+export function kbo(s: string | undefined | null): string | null {
+  if (!s) return null;
+  const d = s.replace(/^BE/i, "").replace(/\D/g, "");
+  if (d.length === 9) return `0${d}`;
+  if (d.length === 10 && (d.startsWith("0") || d.startsWith("1"))) return d;
+  return null;
+}

@@ -18,6 +18,7 @@ import type {
   SourceRef,
   VoteRecord,
 } from "../src/lib/types";
+import { buildMoney } from "./money";
 import {
   commissionMeetings,
   type EpBody,
@@ -29,7 +30,7 @@ import {
   iwMeetings,
   register,
 } from "./sources";
-import { log, OUT, slug, writeOut } from "./util";
+import { log, norm, OUT, slug, writeOut } from "./util";
 
 const TERM_START = "2024-07-16";
 const now = new Date();
@@ -408,6 +409,11 @@ async function main() {
       sub: `${o.meetings} meetings${o.category ? `, ${o.category}` : ""}`,
     })),
   ];
+  /* 8. Geldstroom */
+  const lobbyByName = new Map<string, string>();
+  for (const o of orgSummaries) if (o.registerId) lobbyByName.set(norm(o.name), o.id);
+  const moneyRes = await buildMoney(lobbyByName);
+  search.push(...moneyRes.search);
   writeOut("search.json", search);
   const totalMeetings = [...meetingsByMep.values()].reduce((n, a) => n + a.length, 0);
   const meta: Meta = {
@@ -446,6 +452,7 @@ async function main() {
         fetchedAt: now.toISOString(),
         records: htv.votes.size,
       },
+      ...moneyRes.meta,
       {
         key: "ec",
         name: "European Commission, meetings with interest representatives",

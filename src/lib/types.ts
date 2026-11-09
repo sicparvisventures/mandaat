@@ -130,7 +130,73 @@ export type Meta = {
 
 export type SearchDoc = {
   id: string;
-  kind: "mep" | "org";
+  kind: "mep" | "org" | "recipient";
   name: string;
   sub: string;
+};
+
+/* ---------------- Geldstroom (phase 2) ---------------- */
+
+export type MoneyFlow = {
+  source: "fts" | "kohesio";
+  year: string;
+  amount: number;
+  programme: string | null;
+  dept: string | null;
+  subject: string | null;
+  url: string | null;
+};
+
+export type TedAward = {
+  id: string;
+  date: string;
+  buyer: string;
+  buyerId: string;
+  winners: { id: string; name: string }[];
+  /** Notice total value. Can be the maximum of a framework agreement, not money spent. */
+  value: number | null;
+  cpv: string | null;
+};
+
+export type RecipientSummary = {
+  id: string;
+  name: string;
+  kbo: string | null;
+  city: string | null;
+  /** EU money committed (FTS) plus EU co-financing (Kohesio) */
+  eu: number;
+  flows: number;
+  won: number;
+  awarded: number;
+  lobbyId: string | null;
+};
+
+export type RecipientDossier = RecipientSummary & {
+  byYear: { year: string; amount: number }[];
+  byProgramme: { name: string; amount: number }[];
+  topFlows: MoneyFlow[];
+  contractsWon: TedAward[];
+  contractsAwarded: TedAward[];
+  awardedValue: number;
+  sources: SourceRef[];
+};
+
+export type MoneyOverview = {
+  generatedAt: string;
+  fts: {
+    years: { year: string; amount: number; count: number; excluded: number }[];
+    byDept: { name: string; amount: number }[];
+  };
+  kohesio: {
+    periods: { period: string; eu: number; total: number; count: number }[];
+    byFund: { name: string; amount: number }[];
+    byProvince: { code: string; amount: number; count: number }[];
+  };
+  ted: {
+    count: number;
+    from: string;
+    byBuyer: { id: string; name: string; count: number; value: number }[];
+    byWinner: { id: string; name: string; count: number }[];
+  };
+  topRecipients: RecipientSummary[];
 };

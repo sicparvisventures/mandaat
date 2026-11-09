@@ -1,4 +1,4 @@
-import { Handshake, IdentificationCard, MagnifyingGlass, X } from "@phosphor-icons/react";
+import { Coins, Handshake, IdentificationCard, MagnifyingGlass, X } from "@phosphor-icons/react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -38,6 +38,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
     onOpenChange(false);
     setTerm("");
     if (r.kind === "mep") navigate({ to: "/dossier/$id", params: { id } });
+    else if (r.kind === "recipient") navigate({ to: "/geld/$id", params: { id } });
     else navigate({ to: "/lobby/$id", params: { id } });
   };
 
@@ -94,6 +95,8 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
                 >
                   {r.kind === "mep" ? (
                     <IdentificationCard size={18} className="shrink-0 text-stamp" aria-hidden />
+                  ) : r.kind === "recipient" ? (
+                    <Coins size={18} className="shrink-0 text-muted" aria-hidden />
                   ) : (
                     <Handshake size={18} className="shrink-0 text-muted" aria-hidden />
                   )}
